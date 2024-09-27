@@ -1,5 +1,7 @@
 # DaplosParserBundle
 
+[![Static code analysis](https://github.com/FarmPublic/DaplosParserBundle/actions/workflows/code_analysis.yml/badge.svg)](https://github.com/FarmPublic/DaplosParserBundle/actions/workflows/code_analysis.yml) [![Testing](https://github.com/FarmPublic/DaplosParserBundle/actions/workflows/testing.yml/badge.svg)](https://github.com/FarmPublic/DaplosParserBundle/actions/workflows/testing.yml) [![emoji-log](https://cdn.rawgit.com/ahmadawais/stuff/ca97874/emoji-log/flat.svg)](https://github.com/ahmadawais/Emoji-Log/)
+
 A Symfony bundle to parse Daplos flat files.
 
 ## Requirements
