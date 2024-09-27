@@ -1,0 +1,22 @@
+{
+    "name": "farmpublic/daplos-parser-bundle",
+    "description": "A Symfony bundle to parse Daplos flat files.",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "FarmPublic\\DaplosParserBundle\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Yoan Bernabeu",
+            "email": "yoan.bernabeu@gmail.com"
+        }
+    ],
+    "require": {
+        "symfony/http-kernel": "^7.1",
+        "symfony/dependency-injection": "^7.1",
+        "symfony/config": "^7.1"
+    }
+}
