@@ -6,5 +6,8 @@ namespace FarmPublic\DaplosParserBundle;
 
 interface DaplosParserInterface
 {
+    /**
+     * @return array<array<string, string>>
+     */
     public function parse(string $filePath): array;
 }

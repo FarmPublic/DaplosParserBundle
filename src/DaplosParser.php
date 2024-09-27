@@ -6,6 +6,9 @@ namespace FarmPublic\DaplosParserBundle;
 
 class DaplosParser implements DaplosParserInterface
 {
+    /**
+     * @return array<array<string, string>>
+     */
     public function parse(string $filePath): array
     {
         $handle = fopen($filePath, 'r');
@@ -13,7 +16,7 @@ class DaplosParser implements DaplosParserInterface
 
         if ($handle) {
             while (($line = fgets($handle)) !== false) {
-                $flag = substr($line, 0, 2);
+                $flag = mb_substr($line, 0, 2);
 
                 $data[] = match ($flag) {
                     'EI' => $this->parseEiFlag($line),
@@ -45,35 +48,37 @@ class DaplosParser implements DaplosParserInterface
             }
             fclose($handle);
         }
+
         return $data;
     }
 
-        /**
-     * Extract and trim a substring from a string
-     */
-    public function extractAndTrim(string $line, int $start, int $length): string {
+    public function extractAndTrim(string $line, int $start, int $length): string
+    {
         // Ensure the line is trimmed from the start before extracting substrings
         $line = ltrim($line);  // Remove leading spaces from the line
-        return trim(substr($line, $start-1, $length));
+
+        return trim(mb_substr($line, $start - 1, $length));
     }
-    
+
     /**
-     * Extract and parse the EI flag
+     * @return array<string, string>
      */
-    private function parseEiFlag($line) {
+    private function parseEiFlag(string $line): array
+    {
         return [
-        'emitter_id' => $this->extractAndTrim($line, 3, 14),  // Emitter identification (SIRET or EAN code)
-        'emitter_code_type' => $this->extractAndTrim($line, 17, 3), // Type of emitter code (5: SIRET, 14: EAN)
-        'recipient_id' => $this->extractAndTrim($line, 20, 14),  // Recipient identification (SIRET or EAN code)
-        'recipient_code_type' => $this->extractAndTrim($line, 34, 3), // Type of recipient code (5: SIRET, 14: EAN)
-        'document_count' => $this->extractAndTrim($line, 37, 4) // Number of documents in the exchange, trimmed to remove any \r or \n
+            'emitter_id' => $this->extractAndTrim($line, 3, 14),  // Emitter identification (SIRET or EAN code)
+            'emitter_code_type' => $this->extractAndTrim($line, 17, 3), // Type of emitter code (5: SIRET, 14: EAN)
+            'recipient_id' => $this->extractAndTrim($line, 20, 14),  // Recipient identification (SIRET or EAN code)
+            'recipient_code_type' => $this->extractAndTrim($line, 34, 3), // Type of recipient code (5: SIRET, 14: EAN)
+            'document_count' => $this->extractAndTrim($line, 37, 4), // Number of documents in the exchange, trimmed to remove any \r or \n
         ];
     }
 
     /**
-     * Extract and parse the DE flag (Entête du document)
+     * @return array<string, string>
      */
-    private function parseDeFlag($line) {
+    private function parseDeFlag(string $line): array
+    {
         return [
             'document_ref' => $this->extractAndTrim($line, 3, 35),  // Référence du document (toujours vide ici)
             'fonction_code' => $this->extractAndTrim($line, 37, 1),  // Fonction (en code), commence à la position 37
@@ -84,9 +89,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the DA flag (Adresses intervenants)
+     * @return array<string, string>
      */
-    private function parseDaFlag($line) {
+    private function parseDaFlag(string $line): array
+    {
         return [
             'qualifiant_intervenant' => $this->extractAndTrim($line, 3, 3),  // Qualifiant de l'intervenant (TF, FR, MR)
             'id_intervenant' => $this->extractAndTrim($line, 6, 17),  // Identification de l'intervenant (SIRET ou autre code)
@@ -105,9 +111,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the DT flag (Type d'agriculture pratiquée)
+     * @return array<string, string>
      */
-    private function parseDtFlag($line) {
+    private function parseDtFlag(string $line): array
+    {
         return [
             'type_agriculture_code' => $this->extractAndTrim($line, 3, 3),  // Type d’agriculture pratiquée (code)
             'num_certificat' => $this->extractAndTrim($line, 6, 20),  // N° de certificat
@@ -116,9 +123,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the DP flag (Parcelle culturale)
+     * @return array<string, string>
      */
-    private function parseDpFlag($line) {
+    private function parseDpFlag(string $line): array
+    {
         return [
             'num_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'id_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Identification parcelle culturale
@@ -153,9 +161,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the PC flag (Parcelle cadastrale)
+     * @return array<string, string>
      */
-    private function parsePcFlag($line) {
+    private function parsePcFlag(string $line): array
+    {
         return [
             'num_ordre_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'ref_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Référence parcelle culturale
@@ -166,9 +175,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the CC flag (Coordonnée des points géographiques)
+     * @return array<string, string>
      */
-    private function parseCcFlag($line) {
+    private function parseCcFlag(string $line): array
+    {
         return [
             'num_ordre_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'ref_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Référence parcelle culturale
@@ -182,9 +192,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the PS flag (Surface parcelle culturale)
+     * @return array<string, string>
      */
-    private function parsePsFlag($line) {
+    private function parsePsFlag(string $line): array
+    {
         return [
             'num_ordre_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'ref_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Référence parcelle culturale
@@ -195,9 +206,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the SC flag (Coordonnées des points géographiques d'une surface)
+     * @return array<string, string>
      */
-    private function parseScFlag($line) {
+    private function parseScFlag(string $line): array
+    {
         return [
             'num_ordre_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'ref_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Référence parcelle culturale
@@ -210,9 +222,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the PE flag (Engagement)
+     * @return array<string, string>
      */
-    private function parsePeFlag($line) {
+    private function parsePeFlag(string $line): array
+    {
         return [
             'num_ordre_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'ref_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Référence parcelle culturale
@@ -234,9 +247,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the PH flag (Historique / Précédent de la parcelle culturale)
+     * @return array<string, string>
      */
-    private function parsePhFlag($line) {
+    private function parsePhFlag(string $line): array
+    {
         return [
             'num_ordre_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'ref_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Référence parcelle culturale
@@ -258,9 +272,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the HA flag (Amendement et résidus)
+     * @return array<string, string>
      */
-    private function parseHaFlag($line) {
+    private function parseHaFlag(string $line): array
+    {
         return [
             'num_ordre_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'ref_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Référence parcelle culturale
@@ -281,9 +296,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the PA flag (Analyse)
+     * @return array<string, string>
      */
-    private function parsePaFlag($line) {
+    private function parsePaFlag(string $line): array
+    {
         return [
             'num_ordre_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'ref_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Référence parcelle culturale
@@ -303,9 +319,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the PV flag (Événement)
+     * @return array<string, string>
      */
-    private function parsePvFlag($line) {
+    private function parsePvFlag(string $line): array
+    {
         return [
             'num_ordre_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'ref_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Référence parcelle culturale
@@ -344,9 +361,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the VC flag (Coordonnées géographiques)
+     * @return array<string, string>
      */
-    private function parseVcFlag($line) {
+    private function parseVcFlag(string $line): array
+    {
         return [
             'num_ordre_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'ref_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Référence parcelle culturale
@@ -360,9 +378,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the VB flag (Cible événement)
+     * @return array<string, string>
      */
-    private function parseVbFlag($line) {
+    private function parseVbFlag(string $line): array
+    {
         return [
             'num_ordre_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'ref_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Référence parcelle culturale
@@ -374,9 +393,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the VI flag (Intrant)
+     * @return array<string, string>
      */
-    private function parseViFlag($line) {
+    private function parseViFlag(string $line): array
+    {
         return [
             'num_ordre_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'ref_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Référence parcelle culturale
@@ -419,9 +439,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the IC flag (Composition du produit)
+     * @return array<string, string>
      */
-    private function parseIcFlag($line) {
+    private function parseIcFlag(string $line): array
+    {
         return [
             'num_ordre_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'ref_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Référence parcelle culturale
@@ -433,9 +454,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the IL flag (Lot fabricant)
+     * @return array<string, string>
      */
-    private function parseIlFlag($line) {
+    private function parseIlFlag(string $line): array
+    {
         return [
             'num_ordre_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'ref_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Référence parcelle culturale
@@ -451,9 +473,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the IA flag (Analyse d'effluent)
+     * @return array<string, string>
      */
-    private function parseIaFlag($line) {
+    private function parseIaFlag(string $line): array
+    {
         return [
             'num_ordre_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'ref_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Référence parcelle culturale
@@ -474,9 +497,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the VR flag (Récolte)
+     * @return array<string, string>
      */
-    private function parseVrFlag($line) {
+    private function parseVrFlag(string $line): array
+    {
         return [
             'num_ordre_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'ref_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Référence parcelle culturale
@@ -496,9 +520,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the RL flag (Lot Récolte)
+     * @return array<string, string>
      */
-    private function parseRlFlag($line) {
+    private function parseRlFlag(string $line): array
+    {
         return [
             'num_ordre_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'ref_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Référence parcelle culturale
@@ -511,9 +536,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the LC flag (Caractérisation du produit récolté pour le lot)
+     * @return array<string, string>
      */
-    private function parseLcFlag($line) {
+    private function parseLcFlag(string $line): array
+    {
         return [
             'num_ordre_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'ref_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Référence parcelle culturale
@@ -526,9 +552,10 @@ class DaplosParser implements DaplosParserInterface
     }
 
     /**
-     * Extract and parse the VH flag (Historique Indicateur de décision)
+     * @return array<string, string>
      */
-    private function parseVhFlag($line) {
+    private function parseVhFlag(string $line): array
+    {
         return [
             'num_ordre_parcelle' => $this->extractAndTrim($line, 3, 4),  // N° d'ordre de la parcelle
             'ref_parcelle_culturale' => $this->extractAndTrim($line, 7, 4),  // Référence parcelle culturale
