@@ -30,11 +30,13 @@
         "symfony/phpunit-bridge": "^7.1"
     },
     "scripts": {
+        "test:phpunit": "./vendor/bin/phpunit tests --testdox --colors=always",
         "test:phpstan": "./vendor/bin/phpstan analyse",
         "test:cs": "./vendor/bin/php-cs-fixer fix --dry-run --stop-on-violation --using-cache=no",
         "test:all": [
             "@test:phpstan",
-            "@test:cs"
+            "@test:cs",
+            "@test:phpunit"
         ]
     }
 }
